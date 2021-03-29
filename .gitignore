@@ -1,6 +1,9 @@
 # Dependency directory
 node_modules
 
+# nektos/act
+.secrets
+
 # Rest pulled from https://github.com/github/gitignore/blob/master/Node.gitignore
 # Logs
 logs

@@ -1,19 +1,20 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import { getInputs, getBlobServiceClient, uploadBlobs, Inputs, Output } from './upload'
 
-async function run(): Promise<void> {
+async function run (): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+    // Retrieve user inputs to action
+    const inputs: Inputs = getInputs()
+    // Retrieve authenticated container client
+    const containerClient = getBlobServiceClient(inputs.account).getContainerClient(inputs.destination)
+    // Upload files to container
+    const output: Output[] = await uploadBlobs(containerClient, inputs.source)
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    core.setOutput('time', new Date().toTimeString())
+    core.setOutput('urls', JSON.stringify(output))
   } catch (error) {
     core.setFailed(error.message)
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 run()
