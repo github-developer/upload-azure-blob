@@ -55,7 +55,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Upload to blob storage
-      uses: azure/CLI@v1
+      uses: Azure/cli@1.0.4
       with:
         inlineScript: |
             az storage blob upload-batch --account-name statichostingwebs --account-key ${{ secrets.AZURE_STORAGE_KEY }} --auth-mode key --overwrite -d '$web' -s .
