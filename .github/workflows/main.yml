@@ -57,9 +57,8 @@ jobs:
     - name: Upload to blob storage
       uses: Azure/cli@1.0.4
       with:
-        inlineScript: |
-           whereis az
-           az storage blob copy --source-container . --source-blob . --destination-container '$web'  --destination-blob statichostingwebs 
+        inlineScript: 
+           az storage blob copy -s . --destination-container '$web'  --destination-blob statichostingwebs 
            # az storage blob upload-batch -d '$web' -s . --account-name statichostingwebs --account-key ${{ secrets.AZURE_STORAGE_KEY }} --auth-mode key 
             # Azure logout
     - name: logout
