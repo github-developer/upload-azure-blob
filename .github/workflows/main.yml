@@ -25,6 +25,7 @@ jobs:
     - run: npm run lint
     - run: npm run test
     - run: pwd
+    - run: ls
     - name: Examine changes
       run: |-
         echo 'FILES_CHANGED<<EOF' >> $GITHUB_ENV
@@ -54,7 +55,7 @@ jobs:
       uses: Azure/cli@1.0.4
       with:
         inlineScript: |
-               az storage blob upload --account-name statichostingwebs --container-name $web --file /dist/* .
+              az storage blob upload --account-name statichostingwebs --container-name $web --file /home/runner/work/upload-azure-blob/* --name $web 
     - name: logout
       run: |
             az logout
