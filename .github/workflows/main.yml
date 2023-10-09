@@ -55,7 +55,7 @@ jobs:
       uses: Azure/cli@1.0.4
       with:
         inlineScript: |
-            az storage blob set-static-websit --account-name statichostingwebs --container $web
+            az storage blob upload -f . --account-name statichostingwebs --container $web
   # Azure logout
     - name: logout
       run: |
