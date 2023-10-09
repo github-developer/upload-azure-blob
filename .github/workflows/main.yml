@@ -58,7 +58,7 @@ jobs:
       uses: Azure/cli@1.0.4
       with:
         inlineScript: |
-            az storage blob upload-batch -d '$web' -s . --account-name statichostingwebs --account-key ${{ secrets.AZURE_STORAGE_KEY }} --auth-mode key --overwrite 
+            az storage blob upload-batch -d '$web' -s . --account-name statichostingwebs --account-key ${{ secrets.AZURE_STORAGE_KEY }} --auth-mode key 
             # Azure logout
     - name: logout
       run: |
