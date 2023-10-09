@@ -1,34 +1,63 @@
-name: Build and Deploy to Blob Storage
 
 on:
   push:
     branches:
-      - main
+    - dev
+  pull_request:
+
+name: Continuous Integration
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
 
-      - name: Build project
-        run: npm run build
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '12'
+    
+    - run: npm install
 
-      - name: Upload build to blob storage
-        uses: azure/storage-blob-action@v1
-        with:
-          account: statichostingwebs
-          accessKey: ${ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
-          container: $web
-          source: dist
+    - run: npm run build
+        
+    - run: npm run lint
 
-deploy:
-       needs: build
-        runs-on: ubuntu-latest
-         - uses: actions/checkout@v3
-         - uses: azure/login@v1
-        with:
+    - run: npm run test
+    
+    - name: Examine changes
+      run: |-
+        echo 'FILES_CHANGED<<EOF' >> $GITHUB_ENV
+        git diff --exit-code dist/index.js >> $GITHUB_ENV
+        echo 'EOF' >> $GITHUB_ENV
+
+    - name: Update dist
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && env.FILES_CHANGED }}
+      uses: swinton/commit@v2.x
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files:
+          dist/index.js
+        commit-message: Update dist
+        
+  Deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: azure/login@v1
+      with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          run: az storage blob set-static-websit --account-name statichostingwebs --container $web
 
+    - name: Upload to blob storage
+      uses: Azure/cli@1.0.4
+      with:
+        inlineScript: |
+            az storage blob set-static-websit --account-name statichostingwebs --container $web
+  # Azure logout
+    - name: logout
+      run: |
+            az logout
+      if: always()
