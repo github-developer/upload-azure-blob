@@ -25,6 +25,7 @@ jobs:
     - run: npm install
 
     - run: npm run build
+    - run: mkdir dist 
         
     - run: npm run lint
 
@@ -45,7 +46,6 @@ jobs:
         files:
           dist/index.js
         commit-message: Update dist
-        
   Deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -58,10 +58,9 @@ jobs:
     - name: Upload to blob storage
       uses: Azure/cli@1.0.4
       with:
-        inlineScript: 
-           az storage blob copy -s . --destination-container '$web'  --destination-blob statichostingwebs 
-           # az storage blob upload-batch -d '$web' -s . --account-name statichostingwebs --account-key ${{ secrets.AZURE_STORAGE_KEY }} --auth-mode key 
-            # Azure logout
+        inlineScript: |
+             az storage blob upload-batch --account-name statichostingwebs -d '$web' -s dist/
+
     - name: logout
       run: |
             az logout
