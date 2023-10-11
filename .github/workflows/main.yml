@@ -52,7 +52,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Upload to blob storage
-      uses: Azure/cli@1.0.4
+      uses: Azure/CLI@V1
       with:
         inlineScript: |
              az storage blob upload-batch --account-name statichostingwebs -d '$web' -s dist/
