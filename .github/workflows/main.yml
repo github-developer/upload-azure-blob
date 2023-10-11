@@ -24,6 +24,7 @@ jobs:
         
     - run: npm run lint
     - run: npm run test
+    - run: mkdir dist
     - run: pwd
     - run: ls
     - name: Examine changes
