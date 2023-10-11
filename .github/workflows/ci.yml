@@ -1,15 +1,3 @@
-             az storage blob upload-batch --account-name statichostingwebs --account-key ${{ secrets.AZURE_STORAGE_KEY }} --auth-mode key --overwrite -d '$web' -s dist/
-             
-             
-             
-              steps:
-    - uses: actions/checkout@v3
-    - uses: azure/login@v1
-      with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
-          
-          
 on:
   push:
     branches:
@@ -54,18 +42,20 @@ jobs:
         with:
           name: build-artifacts
           path: dist
-          
-    - uses: actions/checkout@v3
-    - uses: azure/login@v1
-      with:
+
+      # Uses the same checkout step from the build job to avoid checking out the repository again
+      - uses: actions/checkout@v3
+
+      - uses: azure/login@v1
+        with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-              
 
       - name: Upload to blob storage
         uses: Azure/cli@1.0.4
         with:
           inlineScript: |
-             az storage blob upload-batch --account-name statichostingwebs --account-key ${{ secrets.AZURE_STORAGE_KEY }} --auth-mode key --overwrite -d '$web' -s dist/
+            az storage blob upload-batch --account-name statichostingwebs --account-key ${{ secrets.AZURE_STORAGE_KEY }} --auth-mode key --overwrite -d '$web' -s dist/
+
       - name: logout
         run: |
           az logout
