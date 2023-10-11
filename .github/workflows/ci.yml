@@ -42,6 +42,9 @@ jobs:
         with:
           name: build-artifacts
           path: dist
+          -run: pwd 
+          
+      -  run: ls
 
       # Uses the same checkout step from the build job to avoid checking out the repository again
       - uses: actions/checkout@v3
