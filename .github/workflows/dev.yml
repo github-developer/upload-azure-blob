@@ -18,8 +18,10 @@ jobs:
 
       - name: Build website
         run: |
-          yarn install
-          yarn build
+          npm install
+          npm run build
+          npm run lint
+          npm run test
 
       - name: Prepare dist directory
         run: |
