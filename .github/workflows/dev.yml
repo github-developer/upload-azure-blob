@@ -1,8 +1,3 @@
-# Continuous Integration workflow to:
-#   1. Build, lint, and test project
-#   2. Commit any updates to "dist" folder
-
-
 on:
   push:
     branches:
