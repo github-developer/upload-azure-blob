@@ -60,6 +60,11 @@ jobs:
         inlineScript: |
              az storage blob upload-batch --account-name staticcontent1 --account-key ${{ secrets.AZURE_STORAGE_KEY }} --auth-mode key --overwrite -d '$web' -s dist/
 
+    - name: Purge CDN endpoint
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+           az cdn endpoint purge --content-paths  "/*" --profile-name "staticwebsite" --name "staticwebsite123.azureedge.net" --resource-group "tester"
     - name: logout
       run: |
             az logout
