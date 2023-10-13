@@ -1,8 +1,5 @@
-name: Manual Run Workflow with Specific Branch YAML File
-
 on:
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
