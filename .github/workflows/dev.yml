@@ -1,16 +1,6 @@
-# Continuous Integration workflow to:
-#   1. Build, lint, and test project
-#   2. Commit any updates to "dist" folder
-
-
+name: tester
 on:
-  push:
-    branches:
-    - main
-  pull_request:
-
-name: Continuous Integration
-
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -58,8 +48,13 @@ jobs:
       uses: Azure/cli@1.0.4
       with:
         inlineScript: |
-             az storage blob upload-batch --account-name statichostingwebs -d '$web' -s dist/
+             az storage blob upload-batch --account-name staticcontent1 --account-key ${{ secrets.AZURE_STORAGE_KEY }} --auth-mode key --overwrite -d '$web' -s dist/
 
+    - name: Purge CDN endpoint
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+           az cdn endpoint purge --content-paths  "/*" --profile-name "staticwebsite" --name "staticwebsite123" --resource-group "tester"
     - name: logout
       run: |
             az logout
