@@ -1,4 +1,4 @@
-name: testerabc
+name: Build & Deploy
 on:
   workflow_dispatch:
 jobs:
