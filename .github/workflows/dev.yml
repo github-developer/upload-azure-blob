@@ -1,9 +1,7 @@
+name: Manual Run Workflow with Specific Branch YAML File
+
 on:
- workflow_dispatch:
- push:
-   branches:
-     - dev
-name: Continuous Integration
+  workflow_dispatch:
 
 jobs:
   build:
