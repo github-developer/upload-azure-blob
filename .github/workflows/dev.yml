@@ -1,6 +1,4 @@
-on:
-  workflow_run:
-    workflows: [main, dev]
+on: workflow_dispatch
 jobs:
   build:
     runs-on: ubuntu-latest
