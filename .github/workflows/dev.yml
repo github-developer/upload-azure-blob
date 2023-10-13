@@ -1,4 +1,4 @@
-name: Basic Workflow Dispatch Example
+name: tester1
 on:
   workflow_dispatch:
 jobs:
