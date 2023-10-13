@@ -1,6 +1,8 @@
 on:
   workflow_run:
-   branches: [production,dev]
+    workflows: [main, dev]
+    types:
+      - completed
 jobs:
   build:
     runs-on: ubuntu-latest
