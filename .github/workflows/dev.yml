@@ -1,53 +1,66 @@
-name: Build and Deploy
+# Continuous Integration workflow to:
+#   1. Build, lint, and test project
+#   2. Commit any updates to "dist" folder
+
 
 on:
-  workflow_dispatch:
   push:
     branches:
-      - dev
+    - main
+  pull_request:
+
+name: Continuous Integration
 
 jobs:
-  build-and-deploy:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '12'
+    
+    - run: npm install
+
+    - run: npm run build
+       
+    - run: npm run lint
+
+    - run: npm run test
+    
+    - name: Examine changes
+      run: |-
+        echo 'FILES_CHANGED<<EOF' >> $GITHUB_ENV
+        git diff --exit-code dist/index.js >> $GITHUB_ENV
+        echo 'EOF' >> $GITHUB_ENV
+
+    - name: Update dist
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && env.FILES_CHANGED }}
+      uses: swinton/commit@v2.x
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files:
+          dist/index.js
+        commit-message: Update dist
+  Deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.16.0
-
-      - name: Build website
-        run: |
-          npm install
-          npm build
-
-      - name: Prepare dist directory
-        run: |
-          mkdir dist_temp
-          mv dist/* dist_temp/
-          mv dist_temp dist
-          shell: bash
-
-      - name: Upload dist directory to artifact store
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-artifacts
-          path: dist
-
-      - name: Download build artifacts from artifact store
-        uses: actions/download-artifact@v3
-        with:
-          name: build-artifacts
-          path: dist
-
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
+    - uses: actions/checkout@v3
+    - uses: azure/login@v1
+      with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Upload to blob storage
-        run: |
-          az storage blob upload-batch --account-name staticcontent1 --account-key ${{ secrets.AZURE_STORAGE_KEY }} --auth-mode key --overwrite -d '$web' -s dist/*
+    - name: Upload to blob storage
+      uses: Azure/cli@1.0.4
+      with:
+        inlineScript: |
+             az storage blob upload-batch --account-name staticcontent1 --account-key ${{ secrets.AZURE_STORAGE_KEY }} --auth-mode key --overwrite -d '$web' -s dist/
 
-      - name: Azure Logout
-        run: |
-          az logout
+    - name: logout
+      run: |
+            az logout
+      if: always()
